@@ -19,7 +19,10 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON A
 
 #include <string.h>
 #include <GL3/gl3w.h>
+
+#if !defined(__APPLE_CC__)
 #include <GL/glu.h>
+#endif
 
 #include <common.h>
 

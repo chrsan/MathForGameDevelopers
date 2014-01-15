@@ -17,11 +17,16 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON A
 
 #include "renderer.h"
 
+#include <iostream>
 #include <vector>
 #include <assert.h>
 
 #include <GL3/gl3w.h>
+
+#if !defined(__APPLE_CC__)
 #include <GL/glu.h>
+#endif
+
 #include <GL/glfw.h>
 
 #include <files.h>
@@ -39,7 +44,10 @@ CRenderer* CRenderer::s_pRenderer = nullptr;
 CRenderer::CRenderer(size_t iWidth, size_t iHeight)
 {
 	if (!HardwareSupported())
+	{
+		std::cerr << "Hardware not supported" << std::endl;
 		exit(1);
+	}
 
 	m_bRenderOrthographic = false;
 
@@ -206,14 +214,22 @@ bool CRenderer::HardwareSupported()
 
 	// Compile a test shader. If it fails we don't support shaders.
 	const char* pszVertexShader =
+#if !defined(__APPLE_CC__)
 		"#version 130\n"
+#else
+		"#version 140\n"
+#endif
 		"void main()"
 		"{"
 		"	gl_Position = vec4(0.0, 0.0, 0.0, 0.0);"
 		"}";
 
 	const char* pszFragmentShader =
+#if !defined(__APPLE_CC__)
 		"#version 130\n"
+#else
+		"#version 140\n"
+#endif
 		"out vec4 vecFragColor;"
 		"void main()"
 		"{"
@@ -249,7 +265,13 @@ bool CRenderer::HardwareSupported()
 	glDeleteShader(iFShader);
 	glDeleteProgram(iProgram);
 
-	return iVertexCompiled == GL_TRUE && iFragmentCompiled == GL_TRUE && iProgramLinked == GL_TRUE;
+	int ok = iVertexCompiled == GL_TRUE && iFragmentCompiled == GL_TRUE && iProgramLinked == GL_TRUE; 
+	if (!ok)
+	{
+		std::cerr << "Could not compile test shaders" << std::endl;
+	}
+
+	return ok == GL_TRUE;
 }
 
 size_t CRenderer::LoadVertexDataIntoGL(size_t iSizeInBytes, float* aflVertices)

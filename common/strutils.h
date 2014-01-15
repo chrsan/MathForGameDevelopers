@@ -86,6 +86,7 @@ inline std::string implode(const std::string& sGlue, std::vector<std::string>& a
 	return sResult;
 }
 
+#if !defined(__APPLE_CC__)
 inline int isspace(int i)
 {
 	if (i == ' ')
@@ -102,6 +103,7 @@ inline int isspace(int i)
 
 	return false;
 }
+#endif
 
 inline std::string ltrim(std::string s)
 {

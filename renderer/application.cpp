@@ -23,6 +23,7 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON A
 #include <iostream>
 #include <fstream>
 #include <string.h>
+#include <stdlib.h>
 
 #include <strutils.h>
 #include <common_platform.h>
@@ -50,7 +51,11 @@ CApplication::CApplication(int argc, char** argv)
 
 void CApplication::OpenWindow(size_t iWidth, size_t iHeight, bool bFullscreen, bool bResizeable)
 {
-	glfwInit();
+	if (!glfwInit())
+	{
+		std::cerr << "Could not initialize GLFW" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 
 	m_bFullscreen = bFullscreen;
 
@@ -64,7 +69,11 @@ void CApplication::OpenWindow(size_t iWidth, size_t iHeight, bool bFullscreen, b
 	m_iWindowHeight = iHeight;
 
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
+#if !defined(__APPLE_CC__)
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 0);
+#else
+    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
+#endif
     glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_FALSE);
 
 	if (m_bMultisampling)
@@ -78,8 +87,9 @@ void CApplication::OpenWindow(size_t iWidth, size_t iHeight, bool bFullscreen, b
 
 	if (!(m_pWindow = (size_t)glfwOpenWindow(iWidth, iHeight, 8, 8, 8, 8, 16, 0, GLFW_WINDOW)))
 	{
+		std::cerr << "Could not open window" << std::endl;
 		glfwTerminate();
-		return;
+		exit(EXIT_FAILURE);
 	}
 
 	int iScreenWidth;
