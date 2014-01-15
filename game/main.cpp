@@ -17,8 +17,40 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON A
 
 #include "game.h"
 
+#if defined(__APPLE_CC__)
+
+#include <iostream>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/param.h>
+#include <mach-o/dyld.h>
+
+static void CurrentDirectoryFix()
+{
+	char real_path[MAXPATHLEN];
+	char exe_path[MAXPATHLEN];
+	
+	uint32_t size = sizeof(exe_path);
+	if (_NSGetExecutablePath(exe_path, &size) != 0)
+	{
+		std::cerr << "Could not get exe path" << std::endl;
+		exit(1);
+	}
+
+	// puts(exe_path);
+	// realpath(real_path, exe_path);
+	// puts(real_path);
+	std::cout << size << std::endl;
+}
+
+#endif
+
 int main(int argc, char* argv[])
 {
+#if defined(__APPLE_CC__)
+	CurrentDirectoryFix();
+#endif
+
 	// Create a game
 	CGame game(argc, argv);
 
