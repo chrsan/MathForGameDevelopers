@@ -21,6 +21,8 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON A
 #include <vector>
 #include <assert.h>
 
+#include <unistd.h>
+
 #include <GL3/gl3w.h>
 
 #if !defined(__APPLE_CC__)
@@ -74,7 +76,20 @@ void CRenderer::Initialize()
 
 void CRenderer::LoadShaders()
 {
-	vector<string> asShaders = ListDirectory("shaders", false);
+        std::string shadersDir;
+
+#if !defined(__APPLE_CC__)
+        shadersDir = "shaders";
+#else
+        shadersDir = GetContentSubDirectory("shaders");
+#endif
+
+	vector<string> asShaders = ListDirectory(shadersDir, false);
+        if (asShaders.empty())
+        {
+                std::cerr << "No shaders found in " << shadersDir << std::endl;
+                exit(1);
+        }
 
 	for (size_t i = 0; i < asShaders.size(); i++)
 	{
@@ -265,7 +280,7 @@ bool CRenderer::HardwareSupported()
 	glDeleteShader(iFShader);
 	glDeleteProgram(iProgram);
 
-	int ok = iVertexCompiled == GL_TRUE && iFragmentCompiled == GL_TRUE && iProgramLinked == GL_TRUE; 
+	int ok = iVertexCompiled == GL_TRUE && iFragmentCompiled == GL_TRUE && iProgramLinked == GL_TRUE;
 	if (!ok)
 	{
 		std::cerr << "Could not compile test shaders" << std::endl;
@@ -423,4 +438,3 @@ void CRenderer::UnloadTextureFromGL(size_t iGLId)
 }
 
 size_t CRenderer::s_iTexturesLoaded = 0;
-

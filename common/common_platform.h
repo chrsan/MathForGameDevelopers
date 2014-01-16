@@ -41,6 +41,10 @@ void Exec(const std::string& sLine);
 int TranslateKeyToQwerty(int iKey);
 int TranslateKeyFromQwerty(int iKey);
 
+#if defined(__APPLE_CC__)
+std::string GetContentSubDirectory(const std::string& sContentSubPath);
+#endif
+
 #ifdef _WIN32
 #define DIR_SEP "\\"
 #else

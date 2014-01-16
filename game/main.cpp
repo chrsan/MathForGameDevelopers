@@ -17,51 +17,8 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON A
 
 #include "game.h"
 
-#if defined(__APPLE_CC__)
-
-#include <iostream>
-#include <string>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/param.h>
-#include <sys/stat.h>
-#include <mach-o/dyld.h>
-
-static bool SetWorkingDirectory()
-{
-    char exec_path[MAXPATHLEN];
-    uint32_t size = sizeof(exec_path);
-    
-    if (_NSGetExecutablePath(exec_path, &size) != 0)
-        return false;
-    
-    char real_path[MAXPATHLEN];
-    if (realpath(exec_path, real_path) == NULL)
-        return false;
-    
-    std::string full_path(real_path);
-    size_t pos = full_path.find_last_of('/');
-    std::string contents_dir = full_path.substr(0, pos) + "/content";
-    
-    struct stat st;
-    if ((stat(contents_dir.c_str(), &st) != 0) || !S_ISDIR(st.st_mode))
-        return false;
-    
-    return chdir(contents_dir.c_str()) == 0;
-}
-
-#endif
-
 int main(int argc, char* argv[])
 {
-#if defined(__APPLE_CC__)
-	if (!SetWorkingDirectory())
-    {
-        std::cerr << "Could not set working directory" << std::endl;
-        exit(1);
-    }
-#endif
-
 	// Create a game
 	CGame game(argc, argv);
 
